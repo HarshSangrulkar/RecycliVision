@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Live Analysis - RECYCLiVISION</title>
+    <!-- Include Bootstrap CSS -->
+    <link
+      href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Include custom CSS -->
+    <link
+      href="{{ url_for('static', filename='css/main.css') }}"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-image: url("D:\Downloads\Aristocrat1\static\css\images\background.jpeg");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        height: 100vh;
+        color: #fff;
+      }
+
+      .container {
+        background: rgba(26, 21, 82, 0.8); /* Transparent dark background */
+        padding: 20px;
+        border-radius: 10px;
+        color: white;
+      }
+
+      #video-container {
+        position: relative;
+        text-align: center;
+      }
+
+      #video {
+        width: 50%;
+        height: 50%;
+        display: none;
+        transform: scaleX(-1); /* Mirror effect */
+      }
+
+      h1,
+      h3 {
+        color: white;
+      }
+
+      #startButton,
+      #stopButton {
+        margin: 10px;
+      }
+
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      /* Style for classification result */
+      #classificationResult {
+        margin-top: 20px;
+        font-size: 20px;
+        font-weight: bold;
+        color: #f8f9fa;
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav>
+      <div class="navbar">
+        <div class="logo"></div>
+        <ul class="menu">
+          <li><a href="/">Home</a></li>
+          <li><a href="/upload">Upload</a></li>
+          <li><a href="/liveanalysis">Live Analysis</a></li>
+          <li><a href="/chatbot">Chat Bot</a></li>
+          <li><a href="/about">About</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Content for live analysis page -->
+    <div class="container">
+      <div id="content" style="margin-top: 2em">
+        <div class="row">
+          <div class="col-sm-12">
+            <h1>Live Waste Classification</h1>
+            <div id="video-container">
+              <video
+                id="video"
+                width="400"
+                height="300"
+                autoplay
+                playsinline
+              ></video>
+            </div>
+            <button id="startButton" onclick="startCamera()">
+              <i class="fas fa-video"></i> Start Camera
+            </button>
+            <button
+              id="stopButton"
+              onclick="stopCamera()"
+              style="display: none"
+            >
+              <i class="fas fa-stop"></i> Stop Camera
+            </button>
+
+            <!-- Display classification result -->
+            <h3 id="classificationResult"></h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let stream = null;
+      let intervalId = null;
+
+      async function startCamera() {
+        const videoElement = document.getElementById("video");
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          videoElement.srcObject = stream;
+          videoElement.style.display = "block";
+          document.getElementById("startButton").style.display = "none";
+          document.getElementById("stopButton").style.display = "inline-block";
+          intervalId = setInterval(sendVideoStream, 1000);
+        } catch (error) {
+          console.error("Error accessing camera:", error);
+          alert(
+            "Error accessing camera. Please make sure your camera is connected and accessible."
+          );
+        }
+      }
+
+      function stopCamera() {
+        if (stream) {
+          const videoTracks = stream.getVideoTracks();
+          videoTracks.forEach((track) => track.stop());
+          stream = null;
+          clearInterval(intervalId);
+          document.getElementById("video").style.display = "none";
+          document.getElementById("startButton").style.display = "inline-block";
+          document.getElementById("stopButton").style.display = "none";
+        }
+      }
+
+      function sendVideoStream() {
+        const video = document.getElementById("video");
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas
+          .getContext("2d")
+          .drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob(function (blob) {
+          const reader = new FileReader();
+          reader.readAsDataURL(blob);
+          reader.onloadend = function () {
+            const base64data = reader.result;
+
+            fetch("/classify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ image: base64data }),
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                document.getElementById("classificationResult").textContent =
+                  "Waste classification is: " + data.result;
+              })
+              .catch((error) => {
+                console.error("Error sending video stream:", error);
+              });
+          };
+        }, "image/jpeg");
+      }
+      setInterval(sendVideoStream, 10000);
+    </script>
+
+    <!-- Include Bootstrap JS -->
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  </body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>About | RECYCLiVISION</title>
+    <!-- Include Bootstrap CSS -->
+    <link
+      href="{{ url_for('static', filename='css/main.css') }}"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header>
+      <nav>
+        <div class="navbar">
+          <div class="logo"></div>
+          <ul class="menu">
+            <li class="nav-item"><a href="/">Home</a></li>
+            <li><a href="/upload">Upload</a></li>
+            <li><a href="/liveanalysis">Live Analysis</a></li>
+            <li><a href="/chatbot">Chat Bot</a></li>
+            <li class="nav-item active"><a href="/about">About</a></li>
+          </ul>
+        </div>
+      </nav>
+      <div class="content">
+        <div class="text-content">
+          <div class="text">About Us</div>
+          <div class="name">Recycl!Vision</div>
+          <div class="description">
+            <p>
+              Recycl!Vision is committed to bringing cutting-edge waste
+              segregation systems to improve environmental sustainability. Our
+              goal is to promote recycling and responsible waste management
+              through smart technology and AI-based solutions.
+            </p>
+          </div>
+        </div>
+      </div>
+    </header>
+    <!-- <div class="main-content">
+      <p>
+        Our innovative waste segregation system categorizes waste into
+        recyclable, organic, and non-recyclable materials automatically. We
+        believe in making recycling a habit by using advanced AI tools to
+        simplify waste management.
+      </p>
+    </div> -->
+
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  </body>
+  <footer>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  </footer>
+</html>
